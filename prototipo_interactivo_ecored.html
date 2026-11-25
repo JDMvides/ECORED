@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRed - Prototipo Inteligente Bogotá</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        eco: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155',
+                            green: '#10b981',
+                            greenGlow: '#059669',
+                            orange: '#f97316',
+                            orangeGlow: '#ea580c',
+                            accent: '#38bdf8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Ocultar barra de desplazamiento pero permitir scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-full flex items-center justify-center p-0 sm:p-4 overflow-x-hidden">
+
+    <!-- CONTENEDOR PRINCIPAL ESTILO MÓVIL (FRAME) -->
+    <div class="w-full sm:max-w-md h-full sm:h-[90vh] bg-slate-900 sm:rounded-3xl shadow-2xl sm:border sm:border-slate-800 flex flex-col relative overflow-hidden">
+        
+        <!-- HEADER FIJO -->
+        <header class="px-5 py-4 glass-panel border-b border-slate-800 flex items-center justify-between z-20 shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-recycle text-white text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
+                        ECO<span class="text-orange-500">RED</span>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded-full font-semibold">BOGOTÁ</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Demo de economía circular</p>
+                </div>
+            </div>
+            
+            <!-- PERFIL RÁPIDO DE USUARIO -->
+            <div class="flex flex-col items-end gap-1">
+                <span id="accountLabel" class="max-w-28 truncate text-[10px] font-semibold text-slate-300">Sin sesión</span>
+                <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/50 px-3 py-1.5 rounded-full">
+                    <i class="fa-solid fa-coins text-orange-400"></i>
+                    <span id="userPoints" class="font-bold text-sm text-orange-300">0</span>
+                    <span class="text-[10px] text-slate-400">pts</span>
+                </div>
+                <button id="accountSwitchBtn" type="button" onclick="focusAccountInput()" class="text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 rounded">Ingresar</button>
+            </div>
+        </header>
+
+        <!-- CONTENIDO DINÁMICO (SCROLLABLE) -->
+        <main id="mainContent" class="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar">
+            
+            <!-- SECCIÓN 1: CANECA INTELIGENTE & DEPÓSITO -->
+            <section id="section-caneca" class="space-y-5 animate-fade-in">
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                    
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/25">
+                            <i class="fa-solid fa-wifi mr-1"></i> Simulación #DC-402
+                        </span>
+                        <span class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-orange-500 mr-1"></i> Calle 72 con Caracas</span>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-white mb-1">Simulador EcoPunto</h2>
+                    <p class="text-xs text-slate-300 mb-4">Cada código ficticio tiene su propio saldo e historial en este navegador. Las cuentas nuevas empiezan con 1.250 puntos de demostración. No ingreses tu cédula ni datos de TuLlave.</p>
+
+                    <!-- SIMULADOR IDENTIFICACIÓN -->
+                    <div class="space-y-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                        <label for="idInput" class="block text-xs font-medium text-slate-300">1. Código de prueba</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </span>
+                                <input type="text" id="idInput" placeholder="Ej. ECO-0001" autocomplete="off" maxlength="20" oninput="updateAccountNameHint()" aria-describedby="idHelp" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                            </div>
+                            <button type="button" onclick="simularNFC()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-md shadow-emerald-600/30 transition flex items-center gap-1.5 shrink-0">
+                                <i class="fa-solid fa-qrcode"></i> Simular QR
+                            </button>
+                        </div>
+                        <label for="displayNameInput" class="block text-xs font-medium text-slate-300">Nombre para el ranking</label>
+                        <input type="text" id="displayNameInput" placeholder="Ej. Alex" autocomplete="nickname" maxlength="24" aria-describedby="displayNameHelp" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                        <p id="displayNameHelp" class="text-[10px] text-slate-500">Al crear un perfil, este nombre aparecerá junto a tus puntos en el ranking de este navegador.</p>
+                        <p id="idHelp" class="text-[10px] text-slate-500">Escribe un código ficticio (por ejemplo ECO-001). Los perfiles locales no tienen contraseña ni son cuentas seguras; no se conecta con TuLlave.</p>
+                        <div id="authStatus" role="status" aria-live="polite" class="text-[11px] text-emerald-400 hidden items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> Perfil local: <strong id="authDisplayName"></strong> (<span id="authIdentity"></span>, saldo: <span id="syncSaldo">0</span> pts)
+                        </div>
+                        <p id="storageNotice" role="status" class="hidden text-[11px] text-orange-300"></p>
+                    </div>
+                </div>
+
+                <!-- SELECCIÓN DE RESIDUOS -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-200 px-1">2. Selecciona el Tipo de Residuo (Código Bogotá)</h3>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <!-- BLANCO -->
+                        <div role="radio" aria-checked="false" tabindex="0" onclick="selectResiduo('blanco', 'Aprovechables (Plástico, Cartón, Vidrio)', 50)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectResiduo('blanco', 'Aprovechables (Plástico, Cartón, Vidrio)', 50)}" class="residuo-card cursor-pointer border border-slate-700 hover:border-white rounded-xl p-3.5 bg-slate-900/80 transition flex items-center justify-between group focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-white text-slate-950 flex items-center justify-center font-bold text-lg shadow-md">
+                                    <i class="fa-solid fa-bottle-water"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-white group-hover:text-white transition">Bolsa Blanca</h4>
+                                    <p class="text-xs text-slate-400">Plásticos, botellas, cartón, vidrio limpio</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">+50 pts/kg</span>
+                        </div>
+
+                        <!-- ORGÁNICO -->
+                        <div role="radio" aria-checked="false" tabindex="0" onclick="selectResiduo('organico', 'Residuos Orgánicos Aprovechables', 40)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectResiduo('organico', 'Residuos Orgánicos Aprovechables', 40)}" class="residuo-card cursor-pointer border border-slate-700 hover:border-emerald-500 rounded-xl p-3.5 bg-slate-900/80 transition flex items-center justify-between group focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+                                    <i class="fa-solid fa-seedling"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-white group-hover:text-emerald-400 transition">Bolsa Verde / Orgánica</h4>
+                                    <p class="text-xs text-slate-400">Restos de comida, cáscaras, jardín</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">+40 pts/kg</span>
+                        </div>
+
+                        <!-- NEGRO -->
+                        <div role="radio" aria-checked="false" tabindex="0" onclick="selectResiduo('negro', 'No Aprovechables / Sanitarios', 10)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectResiduo('negro', 'No Aprovechables / Sanitarios', 10)}" class="residuo-card cursor-pointer border border-slate-700 hover:border-slate-400 rounded-xl p-3.5 bg-slate-900/80 transition flex items-center justify-between group focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-lg shadow-md">
+                                    <i class="fa-solid fa-trash"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-300 group-hover:text-slate-100 transition">Bolsa Negra</h4>
+                                    <p class="text-xs text-slate-400">Papel higiénico, servilletas sucias</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-700">+10 pts/kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTÓN DE DEPÓSITO SIMULADO -->
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Residuo seleccionado:</span>
+                        <span id="selectedResiduoText" class="font-bold text-emerald-400">Ninguno (Selecciona arriba)</span>
+                    </div>
+                    <label for="weightInput" class="block text-xs text-slate-400">Peso simulado (kg)</label>
+                    <input id="weightInput" type="number" min="0.1" max="20" step="0.1" value="1.5" oninput="updateEstimate()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" aria-describedby="weightHelp">
+                    <p id="weightHelp" class="text-[10px] text-slate-500">Rango de demostración: 0,1 a 20 kg. No hay sensor conectado.</p>
+                    <label for="locationSelect" class="block text-xs text-slate-400">EcoPunto/campaña simulada</label>
+                    <select id="locationSelect" onchange="updateEstimate()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        <option value="1">DC-402 · Calle 72 con Caracas · x1</option>
+                        <option value="2">Centro Internacional · campaña x2</option>
+                        <option value="1.5">Parque de la 93 · campaña x1,5</option>
+                        <option value="1" disabled>Plaza de Bolívar · próximamente</option>
+                    </select>
+                    <p class="text-[10px] text-slate-500">Puedes elegir una campaña para probarla; la app no valida ubicación ni vigencia.</p>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Puntos estimados:</span>
+                        <span id="pointsEstimate" aria-live="polite" class="font-bold text-emerald-400">Selecciona un residuo</span>
+                    </div>
+                    <button onclick="depositarResiduo()" id="btnDepositar" disabled class="w-full py-3 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed shadow-none transition flex items-center justify-center gap-2" aria-describedby="depositHelp">
+                        <i class="fa-solid fa-box-archive"></i> Simular depósito
+                    </button>
+                    <p id="depositHelp" class="text-[10px] text-slate-500">Valida el código de prueba y selecciona un residuo para continuar.</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-white">Actividad reciente</h3>
+                        <span class="text-[10px] text-slate-500">Guardada en este navegador</span>
+                    </div>
+                    <div id="historyList" class="space-y-2 text-xs text-slate-400" aria-live="polite"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: ZONAS CALIENTES (HOTSPOTS) -->
+            <section id="section-hotspots" class="space-y-4 hidden animate-fade-in">
+                <div class="bg-gradient-to-r from-orange-600/20 via-slate-900 to-slate-900 border border-orange-500/30 p-4 rounded-2xl relative overflow-hidden">
+                    <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-28 h-28 bg-orange-500/20 rounded-full blur-xl"></div>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded border border-orange-500/20 inline-block mb-2">
+                        <i class="fa-solid fa-fire text-orange-500 mr-1 animate-bounce"></i> Evento Activo 2X Puntos
+                    </span>
+                    <h2 class="text-xl font-extrabold text-white">Zonas Calientes en Bogotá</h2>
+                    <p class="text-xs text-slate-300 mt-1">Selecciona un lugar para ver su ubicación aproximada en el mapa. Las ubicaciones y campañas son ilustrativas; no se usa tu GPS ni se confirma que exista allí un EcoPunto.</p>
+                </div>
+
+                <!-- LISTA DE HOTSPOTS -->
+                <div class="space-y-3">
+                    <!-- Hotspot 1 -->
+                    <div class="bg-slate-900 border border-orange-500/40 rounded-xl p-4 relative shadow-lg">
+                        <div class="absolute top-3 right-3 bg-orange-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow">
+                            x2 PUNTOS
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 shrink-0">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Centro Internacional</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">Calle 26 con Cra 10 (Estación San Diego)</p>
+                                <div class="flex items-center gap-3 mt-3 text-[11px] text-slate-300">
+                                    <span><i class="fa-regular fa-clock text-orange-400 mr-1"></i> Termina en 4h 22m</span>
+                                    <span><i class="fa-solid fa-users text-emerald-400 mr-1"></i> 142 reciclando hoy</span>
+                                </div>
+                                <button type="button" onclick="verHotspotEnMapa('centro')" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-xs font-semibold text-orange-300 hover:bg-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                                    <i class="fa-solid fa-map-location-dot"></i> Ver ubicación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotspot 2 -->
+                    <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 relative transition">
+                        <div class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
+                            x1.5 PUNTOS
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 shrink-0">
+                                <i class="fa-solid fa-tree"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Parque de la 93 (Chapinero)</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">Cra. 13 #93-01</p>
+                                <div class="flex items-center gap-3 mt-3 text-[11px] text-slate-300">
+                                    <span><i class="fa-regular fa-clock text-emerald-400 mr-1"></i> Inicia a las 2:00 PM</span>
+                                    <span><i class="fa-solid fa-users text-slate-400 mr-1"></i> 98 interesados</span>
+                                </div>
+                                <button type="button" onclick="verHotspotEnMapa('parque93')" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                                    <i class="fa-solid fa-map-location-dot"></i> Ver ubicación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotspot 3 -->
+                    <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 relative transition">
+                        <div class="absolute top-3 right-3 bg-slate-800 text-slate-300 font-extrabold text-[10px] px-2 py-0.5 rounded-full">
+                            PRÓXIMAMENTE
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                <i class="fa-solid fa-store"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Plaza de Bolívar</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">Cra. 7 #11-10</p>
+                                <div class="flex items-center gap-3 mt-3 text-[11px] text-slate-300">
+                                    <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i> Sábado, 10:00 AM</span>
+                                </div>
+                                <button type="button" onclick="verHotspotEnMapa('plazaBolivar')" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400">
+                                    <i class="fa-solid fa-map-location-dot"></i> Ver ubicación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="hotspotMapPanel" class="hidden overflow-hidden rounded-2xl border border-slate-700 bg-slate-900">
+                    <div class="flex items-start justify-between gap-3 p-4">
+                        <div>
+                            <h3 id="hotspotMapTitle" tabindex="-1" class="text-sm font-bold text-white focus:outline-none">Ubicación seleccionada</h3>
+                            <p id="hotspotMapAddress" class="mt-1 text-xs text-slate-400"></p>
+                        </div>
+                        <button type="button" onclick="cerrarMapaHotspot()" aria-label="Cerrar mapa" class="rounded-lg px-2 py-1 text-slate-400 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <iframe id="hotspotMapFrame" title="Mapa de la ubicación seleccionada" class="h-64 w-full border-0 bg-slate-800" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                    <div class="space-y-2 p-3">
+                        <p class="text-[10px] text-slate-400">Punto de referencia aproximado; no confirma la ubicación ni disponibilidad de una estación de reciclaje. Al cargar el mapa, el navegador solicita recursos externos a OpenStreetMap.</p>
+                        <a id="hotspotMapLink" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300">
+                            Abrir mapa en OpenStreetMap <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: VS DE LOCALIDADES -->
+            <section id="section-vs" class="space-y-4 hidden animate-fade-in">
+                <div class="bg-gradient-to-br from-indigo-950/50 via-slate-900 to-slate-900 border border-indigo-500/30 p-4 rounded-2xl text-center relative overflow-hidden">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded border border-indigo-500/20 inline-block mb-2">
+                        <i class="fa-solid fa-trophy text-yellow-400 mr-1"></i> Batalla Mensual Activa
+                    </span>
+                    <h2 class="text-xl font-extrabold text-white">VS de Localidades Bogotá</h2>
+                    <p class="text-xs text-slate-300 mt-1">¿Cuál localidad reciclará más kilogramos este mes? Apoya a tu favorita con tus depósitos. Cifras ilustrativas de la demo.</p>
+                </div>
+
+                <!-- TARJETA DE ENFRENTAMIENTO -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
+                    <div class="flex items-center justify-between text-center">
+                        <!-- Localidad A -->
+                        <div class="flex-1 space-y-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 text-2xl shadow-md">
+                                <i class="fa-solid fa-landmark"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Teusaquillo</h3>
+                            <p class="text-xs text-orange-400 font-extrabold" id="scoreTeusaquillo">14.8 Ton</p>
+                        </div>
+
+                        <!-- VS Badge -->
+                        <div class="px-3">
+                            <span class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs text-slate-300 shadow-inner">
+                                VS
+                            </span>
+                        </div>
+
+                        <!-- Localidad B -->
+                        <div class="flex-1 space-y-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl shadow-md">
+                                <i class="fa-solid fa-mountain-city"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Chapinero</h3>
+                            <p class="text-xs text-emerald-400 font-extrabold" id="scoreChapinero">16.2 Ton</p>
+                        </div>
+                    </div>
+
+                    <!-- BARRA DE PROGRESO -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-[11px] text-slate-400 font-medium">
+                            <span id="labelTeusaquillo">Teusaquillo (48%)</span>
+                            <span id="labelChapinero">Chapinero (52%)</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden flex p-0.5 border border-slate-700">
+                            <div id="barTeusaquillo" class="bg-orange-500 h-full rounded-l-full transition-all duration-500" style="width: 48%"></div>
+                            <div id="barChapinero" class="bg-emerald-500 h-full rounded-r-full transition-all duration-500" style="width: 52%"></div>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES DE APOYO -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <button id="voteTeusaquillo" onclick="apoyarLocalidad('Teusaquillo')" class="bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/40 text-orange-300 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-hand-holding-heart"></i> Apoyar Teusaquillo
+                        </button>
+                        <button id="voteChapinero" onclick="apoyarLocalidad('Chapinero')" class="bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-hand-holding-heart"></i> Apoyar Chapinero
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-800 p-3.5 rounded-xl text-xs text-slate-400 flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-emerald-400 text-lg"></i>
+                    <p>En una implementación real, el destino de los fondos y el mecanismo de votación deberían publicarse y verificarse.</p>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 4: GAMIFICACIÓN Y RANKINGS -->
+            <section id="section-ranking" class="space-y-4 hidden animate-fade-in">
+                <!-- TARJETA IMPACTO AMBIENTAL -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-sm mb-2">
+                            <i class="fa-solid fa-recycle"></i>
+                        </div>
+                        <span class="text-xs text-slate-400">Reciclado por ti</span>
+                        <h4 id="impactKg" class="text-lg font-black text-white">0 kg</h4>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm mb-2">
+                            <i class="fa-solid fa-box"></i>
+                        </div>
+                        <span class="text-xs text-slate-400">Depósitos realizados</span>
+                        <h4 id="impactDeposits" class="text-lg font-black text-white">0</h4>
+                    </div>
+                </div>
+
+                <p class="text-[10px] text-slate-500">Incluye perfiles ficticios de ejemplo y todos los perfiles creados en este navegador. Solo se muestran puntos y kilos de depósitos del periodo.</p>
+
+                <!-- SELECTOR SEMANAL / MENSUAL -->
+                <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                    <button onclick="toggleRankingTab('semanal')" id="tabSemanalBtn" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-white transition shadow">Semanal</button>
+                    <button onclick="toggleRankingTab('mensual')" id="tabMensualBtn" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition">Mensual</button>
+                </div>
+
+                <!-- TABLA DE RANKING -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+                    <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        <span># Usuario</span>
+                        <span>Kg / Puntos</span>
+                    </div>
+
+                    <div class="divide-y divide-slate-800/60" id="rankingList" aria-live="polite">
+                        <!-- El ranking se renderiza desde los datos de demostración. -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-recompensas" class="space-y-4 hidden animate-fade-in">
+                <div class="bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 p-4 rounded-2xl">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/20 inline-block mb-2">
+                        <i class="fa-solid fa-gift mr-1"></i> Catálogo Aliados
+                    </span>
+                    <h2 class="text-xl font-extrabold text-white">Canjea tus Puntos EcoRed</h2>
+                    <p class="text-xs text-slate-300 mt-1">Catálogo demostrativo: los canjes no se procesan ni generan bonos reales.</p>
+                </div>
+
+                <!-- CATÁLOGO -->
+                <div class="grid grid-cols-1 gap-3">
+                    <!-- Item 1: SITP -->
+                    <div class="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-xl flex items-center justify-between transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg font-bold shrink-0">
+                                <i class="fa-solid fa-bus-simple"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Recarga Tarjeta TuLlave</h4>
+                                <p class="text-xs text-slate-400">$10,000 COP para SITP / TransMilenio</p>
+                                <span class="inline-block mt-1.5 text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">1,000 Puntos</span>
+                            </div>
+                        </div>
+                        <button id="rewardTransit" onclick="canjearRecompensa('Recarga TuLlave $10k', 1000)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition">
+                            Canjear
+                        </button>
+                    </div>
+
+                    <!-- Item 2: D1 / ARA -->
+                    <div class="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-xl flex items-center justify-between transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 text-lg font-bold shrink-0">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Bono Tiendas D1 o Ara</h4>
+                                <p class="text-xs text-slate-400">Bono de $15,000 COP para canasta familiar</p>
+                                <span class="inline-block mt-1.5 text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">1,500 Puntos</span>
+                            </div>
+                        </div>
+                        <button id="rewardMarket" onclick="canjearRecompensa('Bono D1 / Ara $15k', 1500)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition">
+                            Canjear
+                        </button>
+                    </div>
+
+                    <!-- Item 3: Gasolineras / Aliados -->
+                    <div class="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-xl flex items-center justify-between transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg font-bold shrink-0">
+                                <i class="fa-solid fa-gas-pump"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Descuento Gasolinera Aliada</h4>
+                                <p class="text-xs text-slate-400">20% dcto en tanqueo o servicios</p>
+                                <span class="inline-block mt-1.5 text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">800 Puntos</span>
+                            </div>
+                        </div>
+                        <button id="rewardFuel" onclick="canjearRecompensa('Descuento Gasolinera', 800)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow transition">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- NAVEGACIÓN INFERIOR (BOTTOM NAV) -->
+        <nav aria-label="Navegación principal" class="absolute bottom-0 left-0 right-0 glass-panel border-t border-slate-800 px-2 py-2 flex items-center justify-around z-20">
+            <button onclick="switchTab('caneca', this)" class="nav-btn flex flex-col items-center py-1 px-2 rounded-xl text-emerald-400 transition">
+                <i class="fa-solid fa-recycle text-lg"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Caneca</span>
+            </button>
+            <button onclick="switchTab('hotspots', this)" class="nav-btn flex flex-col items-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-fire text-lg"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Hotspots</span>
+            </button>
+            <button onclick="switchTab('vs', this)" class="nav-btn flex flex-col items-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-shield-halved text-lg"></i>
+                <span class="text-[10px] font-semibold mt-0.5">VS Local</span>
+            </button>
+            <button onclick="switchTab('ranking', this)" class="nav-btn flex flex-col items-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-trophy text-lg"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Ranking</span>
+            </button>
+            <button onclick="switchTab('recompensas', this)" class="nav-btn flex flex-col items-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-gift text-lg"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Premios</span>
+            </button>
+        </nav>
+
+        <!-- MODAL DE MENSAJE PERSONALIZADO (SIN ALERT) -->
+        <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc" aria-hidden="true" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden animate-fade-in">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 max-w-xs w-full text-center space-y-4 shadow-2xl">
+                <div id="modalIcon" class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-2xl mx-auto">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 id="modalTitle" class="font-bold text-white text-base">¡Éxito!</h3>
+                    <p id="modalDesc" class="text-xs text-slate-300">Operación realizada correctamente.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="modalCancelButton" onclick="closeModal()" class="hidden flex-1 border border-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-xs transition hover:bg-slate-800">Volver</button>
+                    <button id="modalActionButton" onclick="handleModalAction()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Entendido</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE INTERACTIVIDAD -->
+    <script>
+        // Estado global de la aplicación
+        let state = { points: 0, totalKg: 0, deposits: 0, history: [], supportedLocality: null };
+
+        // Cambiar entre pestañas
+        function switchTab(tabId, btnElement) {
+            // Ocultar todas las secciones
+            ['caneca', 'hotspots', 'vs', 'ranking', 'recompensas'].forEach(id => {
+                document.getElementById('section-' + id).classList.add('hidden');
+            });
+
+            // Mostrar la seleccionada
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+
+            // Actualizar estilos de la barra de navegación
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-emerald-400');
+                btn.classList.add('text-slate-400');
+            });
+            if (btnElement) {
+                btnElement.classList.remove('text-slate-400');
+                btnElement.classList.add('text-emerald-400');
+            }
+
+            // Scroll al inicio de la vista
+            document.getElementById('mainContent').scrollTop = 0;
+        }
+
+        // Simular identificación TuLlave / QR
+        function simularNFC() {
+            const inputVal = document.getElementById('idInput').value;
+            if(!inputVal) {
+                showModal('Atención', 'Por favor ingresa un número de cédula o ID válido.', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                return;
+            }
+            document.getElementById('authStatus').classList.remove('hidden');
+            document.getElementById('authStatus').classList.add('flex');
+            showModal('¡Identificación Exitosa!', 'Ciudadano validado correctamente vía NFC / TuLlave. Ya puedes depositar tus residuos.', 'fa-nfc-symbol', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+        }
+
+        // Seleccionar residuo en la caneca inteligente
+        function selectResiduo(type, name, basePoints, borderClass) {
+            state.selectedResiduoType = type;
+            state.selectedResiduoName = name;
+            state.selectedResiduoPoints = basePoints;
+
+            // Actualizar UI texto
+            document.getElementById('selectedResiduoText').textContent = name + ' (+' + basePoints + ' pts)';
+            
+            // Habilitar botón de depósito
+            const btn = document.getElementById('btnDepositar');
+            btn.disabled = false;
+            btn.className = "w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2 cursor-pointer";
+        }
+
+        // Depositar residuo y acumular puntos (con multiplicador x2 de zona caliente)
+        function depositarResiduo() {
+            if(!state.selectedResiduoType) return;
+
+            // Multiplicador x2 por estar en Zona Caliente activa
+            const puntosGanados = state.selectedResiduoPoints * 2;
+            state.points += puntosGanados;
+
+            // Actualizar contadores en pantalla
+            document.getElementById('userPoints').textContent = state.points.toLocaleString();
+            document.getElementById('syncSaldo').textContent = state.points.toLocaleString();
+            document.getElementById('rankUserPoints').textContent = state.points.toLocaleString() + ' pts';
+
+            showModal('¡Depósito Exitoso (+ ' + puntosGanados + ' pts)!', 'El sensor IoT detectó y clasificó tu material correctamente. ¡Gracias por reciclar en la Zona Caliente (x2 aplicado)!', 'fa-recycle', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+
+            // Resetear selección
+            state.selectedResiduoType = null;
+            document.getElementById('selectedResiduoText').textContent = 'Ninguno (Selecciona arriba)';
+            const btn = document.getElementById('btnDepositar');
+            btn.disabled = true;
+            btn.className = "w-full py-3 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed shadow-none transition flex items-center justify-center gap-2";
+        }
+
+        // Apoyar localidad en el VS
+        function apoyarLocalidad(nombre) {
+            showModal('¡Voto Registrado!', 'Has sumado 50 puntos de impacto a favor de ' + nombre + ' en la batalla mensual de localidades de Bogotá.', 'fa-hand-holding-heart', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+            
+            // Simular cambio sutil en barras
+            if(nombre === 'Teusaquillo') {
+                document.getElementById('barTeusaquillo').style.width = '49%';
+                document.getElementById('barChapinero').style.width = '51%';
+                document.getElementById('scoreTeusaquillo').textContent = '15.1 Ton';
+            } else {
+                document.getElementById('barChapinero').style.width = '53%';
+                document.getElementById('barTeusaquillo').style.width = '47%';
+                document.getElementById('scoreChapinero').textContent = '16.5 Ton';
+            }
+        }
+
+        // Canjear premios
+        function canjearRecompensa(premio, costo) {
+            if(state.points < costo) {
+                showModal('Puntos Insuficientes', 'Te faltan ' + (costo - state.points) + ' puntos para redimir ' + premio + '. ¡Recicla más en los EcoPuntos!', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                return;
+            }
+
+            state.points -= costo;
+            document.getElementById('userPoints').textContent = state.points.toLocaleString();
+            document.getElementById('syncSaldo').textContent = state.points.toLocaleString();
+            document.getElementById('rankUserPoints').textContent = state.points.toLocaleString() + ' pts';
+
+            showModal('¡Canje Exitoso!', 'Has adquirido con éxito: ' + premio + '. Revisa tu mensaje de texto o app TuLlave con el código de redención.', 'fa-ticket', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+        }
+
+        // Alternar pestañas de Ranking
+        function toggleRankingTab(tipo) {
+            const semBtn = document.getElementById('tabSemanalBtn');
+            const menBtn = document.getElementById('tabMensualBtn');
+
+            if(tipo === 'semanal') {
+                semBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-white transition shadow";
+                menBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+                showModal('Ranking Semanal', 'Mostrando los mejores recicladores de los últimos 7 días en Bogotá.', 'fa-trophy', 'text-yellow-400 bg-yellow-500/20 border-yellow-500/40');
+            } else {
+                menBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-white transition shadow";
+                semBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+                showModal('Ranking Mensual', 'Mostrando el acumulado del mes para definir la localidad y los premios mayores.', 'fa-medal', 'text-amber-400 bg-amber-500/20 border-amber-500/40');
+            }
+        }
+
+        // Funciones Modal personalizado (Reemplazo seguro de alert)
+        function showModal(title, desc, iconClass, iconContainerClass) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDesc').textContent = desc;
+            
+            const iconContainer = document.getElementById('modalIcon');
+            iconContainer.className = "w-12 h-12 rounded-full flex items-center justify-center text-2xl mx-auto border " + iconContainerClass;
+            iconContainer.innerHTML = '<i class="fa-solid ' + iconClass + '"></i>';
+
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+    </script>
+    <script>
+        (function () {
+            const profilesStorageKey = 'ecored-demo-profiles-v1';
+            const activeAccountStorageKey = 'ecored-demo-active-account-v1';
+            const legacyStorageKey = 'ecored-demo-v1';
+            const profiles = {
+                semanal: [
+                    { name: 'Camila R.', initials: 'CR', points: 780, kg: 15.4 },
+                    { name: 'Andrés M.', initials: 'AM', points: 660, kg: 13.1 },
+                    { name: 'Valentina G.', initials: 'VG', points: 520, kg: 10.2 }
+                ],
+                mensual: [
+                    { name: 'Camila R.', initials: 'CR', points: 2450, kg: 48.2 },
+                    { name: 'Andrés M.', initials: 'AM', points: 2210, kg: 41.7 },
+                    { name: 'Valentina G.', initials: 'VG', points: 1980, kg: 37.9 }
+                ]
+            };
+            let authenticated = false;
+            let currentCode = null;
+            let selectedResiduo = null;
+            let rankPeriod = 'semanal';
+            let pendingAction = null;
+            let lastFocusedElement = null;
+            let hotspotMapOpener = null;
+            const hotspotLocations = {
+                centro: {
+                    name: 'Centro Internacional',
+                    address: 'Referencia aproximada: Calle 26 con Carrera 10 (San Diego), Bogotá.',
+                    latitude: 4.6163,
+                    longitude: -74.0702
+                },
+                parque93: {
+                    name: 'Parque de la 93',
+                    address: 'Referencia aproximada: Carrera 13 #93-01, Bogotá.',
+                    latitude: 4.6767,
+                    longitude: -74.0481
+                },
+                plazaBolivar: {
+                    name: 'Plaza de Bolívar',
+                    address: 'Referencia aproximada: Carrera 7 #11-10, Bogotá. Lugar próximo; no es una campaña activa.',
+                    latitude: 4.5981,
+                    longitude: -74.0758
+                }
+            };
+
+            function nonNegativeNumber(value, fallback) {
+                const number = Number(value);
+                return Number.isFinite(number) && number >= 0 ? number : fallback;
+            }
+
+            function createInitialState() {
+                return {
+                    displayName: '',
+                    points: 1250,
+                    totalKg: 0,
+                    deposits: 0,
+                    history: [],
+                    supportedLocality: null
+                };
+            }
+
+            function normalizeCode(code) {
+                return code.trim().toUpperCase();
+            }
+
+            function sanitizeState(saved) {
+                const initial = createInitialState();
+                if (!saved || typeof saved !== 'object') return initial;
+                return {
+                    displayName: typeof saved.displayName === 'string'
+                        ? saved.displayName.trim().replace(/\s+/g, ' ').slice(0, 24)
+                        : '',
+                    points: nonNegativeNumber(saved.points, initial.points),
+                    totalKg: nonNegativeNumber(saved.totalKg, initial.totalKg),
+                    deposits: nonNegativeNumber(saved.deposits, initial.deposits),
+                    history: Array.isArray(saved.history)
+                        ? saved.history
+                            .filter(function (entry) {
+                                return entry && typeof entry.label === 'string' &&
+                                    Number.isFinite(Number(entry.points)) && typeof entry.date === 'string';
+                            })
+                            .slice(0, 20)
+                            .map(function (entry) {
+                                return {
+                                    label: entry.label,
+                                    points: Number(entry.points),
+                                    date: entry.date,
+                                    kg: nonNegativeNumber(entry.kg, 0)
+                                };
+                            })
+                        : [],
+                    supportedLocality: ['Teusaquillo', 'Chapinero'].includes(saved.supportedLocality) ? saved.supportedLocality : null
+                };
+            }
+
+            function loadProfiles() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(profilesStorageKey) || 'null');
+                    const accounts = {};
+                    if (saved && saved.accounts && typeof saved.accounts === 'object' && !Array.isArray(saved.accounts)) {
+                        Object.keys(saved.accounts).forEach(function (code) {
+                            if (/^[A-Z0-9-]{4,20}$/.test(code)) {
+                                accounts[code] = sanitizeState(saved.accounts[code]);
+                            }
+                        });
+                    }
+                    return { accounts: accounts, legacyImported: Boolean(saved && saved.legacyImported) };
+                } catch (error) {
+                    console.error('No fue posible leer los perfiles guardados de EcoRed.', error);
+                    const notice = document.getElementById('storageNotice');
+                    notice.textContent = 'No se pudieron leer los perfiles locales; inicia una sesión de prueba nueva.';
+                    notice.classList.remove('hidden');
+                    return { accounts: {}, legacyImported: false };
+                }
+            }
+
+            const profileStore = loadProfiles();
+            const profilesByCode = profileStore.accounts;
+            let legacyImported = profileStore.legacyImported;
+
+            function saveState() {
+                if (!authenticated || !currentCode) return;
+                try {
+                    profilesByCode[currentCode] = sanitizeState(state);
+                    localStorage.setItem(profilesStorageKey, JSON.stringify({
+                        accounts: profilesByCode,
+                        legacyImported: legacyImported
+                    }));
+                    localStorage.setItem(activeAccountStorageKey, currentCode);
+                    document.getElementById('storageNotice').classList.add('hidden');
+                } catch (error) {
+                    console.error('No fue posible guardar el perfil de EcoRed en este navegador.', error);
+                    const notice = document.getElementById('storageNotice');
+                    notice.textContent = 'No se pudo guardar este perfil; los cambios podrían perderse al recargar.';
+                    notice.classList.remove('hidden');
+                }
+            }
+
+            function importLegacyProfile(code, displayName) {
+                if (legacyImported) return false;
+                try {
+                    const legacy = JSON.parse(localStorage.getItem(legacyStorageKey) || 'null');
+                    if (legacy && typeof legacy === 'object') {
+                        profilesByCode[code] = sanitizeState(Object.assign({}, legacy, { displayName: displayName }));
+                    }
+                    legacyImported = true;
+                    return Boolean(legacy && typeof legacy === 'object');
+                } catch (error) {
+                    console.error('No fue posible migrar el perfil previo de EcoRed.', error);
+                    legacyImported = true;
+                    const notice = document.getElementById('storageNotice');
+                    notice.textContent = 'No se pudieron importar los datos anteriores; se conservarán en el navegador y se iniciará un perfil nuevo.';
+                    notice.classList.remove('hidden');
+                    return false;
+                }
+            }
+
+            function activateAccount(code, displayName) {
+                const isNewAccount = !profilesByCode[code];
+                const importedLegacy = isNewAccount && importLegacyProfile(code, displayName);
+                const hasSavedDisplayName = Boolean(profilesByCode[code] && profilesByCode[code].displayName);
+                saveState();
+                currentCode = code;
+                authenticated = true;
+                state = profilesByCode[code]
+                    ? sanitizeState(profilesByCode[code])
+                    : Object.assign(createInitialState(), { displayName: displayName });
+                document.getElementById('idInput').value = code;
+                document.getElementById('displayNameInput').value = state.displayName;
+                document.getElementById('displayNameInput').readOnly = hasSavedDisplayName;
+                document.getElementById('displayNameHelp').textContent = hasSavedDisplayName
+                    ? 'Este nombre está asociado al perfil.'
+                    : 'Este perfil anterior no tenía nombre; escribe uno y vuelve a validar el código para guardarlo.';
+                document.getElementById('accountLabel').textContent = (state.displayName || code) + ' · ' + code;
+                document.getElementById('accountSwitchBtn').textContent = 'Cambiar';
+                document.getElementById('authStatus').classList.remove('hidden');
+                document.getElementById('authStatus').classList.add('flex');
+                document.getElementById('authIdentity').textContent = code;
+                document.getElementById('authDisplayName').textContent = state.displayName || code;
+                selectedResiduo = null;
+                document.getElementById('selectedResiduoText').textContent = 'Ninguno (Selecciona arriba)';
+                document.querySelectorAll('.residuo-card').forEach(function (card) {
+                    card.setAttribute('aria-checked', 'false');
+                    card.classList.remove('ring-2', 'ring-emerald-400', 'border-emerald-400');
+                });
+                saveState();
+                render();
+                return { isNewAccount: isNewAccount && !importedLegacy, importedLegacy: importedLegacy };
+            }
+
+            function restoreActiveAccount() {
+                try {
+                    const savedCode = localStorage.getItem(activeAccountStorageKey);
+                    if (savedCode && /^[A-Z0-9-]{4,20}$/.test(savedCode) && profilesByCode[savedCode]) {
+                        activateAccount(savedCode);
+                    } else {
+                        state = { points: 0, totalKg: 0, deposits: 0, history: [], supportedLocality: null };
+                    }
+                } catch (error) {
+                    console.error('No fue posible restaurar la sesión de EcoRed.', error);
+                    state = { points: 0, totalKg: 0, deposits: 0, history: [], supportedLocality: null };
+                }
+            }
+
+            function forgetActiveAccount() {
+                try {
+                    localStorage.removeItem(activeAccountStorageKey);
+                } catch (error) {
+                    console.error('No fue posible cerrar la sesión activa de EcoRed.', error);
+                    const notice = document.getElementById('storageNotice');
+                    notice.textContent = 'No se pudo borrar la sesión guardada en este navegador.';
+                    notice.classList.remove('hidden');
+                }
+                authenticated = false;
+                currentCode = null;
+                selectedResiduo = null;
+                state = { points: 0, totalKg: 0, deposits: 0, history: [], supportedLocality: null };
+                document.getElementById('accountLabel').textContent = 'Sin sesión';
+                document.getElementById('accountSwitchBtn').textContent = 'Ingresar';
+                document.getElementById('authStatus').classList.add('hidden');
+                document.getElementById('authStatus').classList.remove('flex');
+                document.getElementById('idInput').value = '';
+                document.getElementById('displayNameInput').value = '';
+                document.getElementById('displayNameInput').readOnly = false;
+                document.getElementById('displayNameHelp').textContent = 'Al crear un perfil, este nombre aparecerá junto a tus puntos en el ranking de este navegador.';
+                document.getElementById('selectedResiduoText').textContent = 'Ninguno (Selecciona arriba)';
+                document.querySelectorAll('.residuo-card').forEach(function (card) {
+                    card.setAttribute('aria-checked', 'false');
+                    card.classList.remove('ring-2', 'ring-emerald-400', 'border-emerald-400');
+                });
+                render();
+            }
+
+            function openAccountInput() {
+                if (document.getElementById('section-caneca').classList.contains('hidden')) {
+                    const navButton = document.querySelector('.nav-btn');
+                    window.switchTab('caneca', navButton);
+                }
+                document.getElementById('idInput').focus();
+                document.getElementById('idInput').select();
+            }
+
+            window.updateAccountNameHint = function () {
+                const code = normalizeCode(document.getElementById('idInput').value);
+                const nameInput = document.getElementById('displayNameInput');
+                const existing = profilesByCode[code];
+                if (existing) {
+                    if (existing.displayName) {
+                        nameInput.value = existing.displayName;
+                        nameInput.readOnly = true;
+                        document.getElementById('displayNameHelp').textContent = 'Perfil existente: se usará el nombre ya guardado.';
+                    } else {
+                        nameInput.value = '';
+                        nameInput.readOnly = false;
+                        document.getElementById('displayNameHelp').textContent = 'Este perfil antiguo no tenía nombre; elige uno para el ranking.';
+                    }
+                } else {
+                    if (nameInput.readOnly) nameInput.value = '';
+                    nameInput.readOnly = false;
+                    document.getElementById('displayNameHelp').textContent = 'Perfil nuevo: elige el nombre que aparecerá en el ranking de este navegador.';
+                }
+            };
+
+            state = { points: 0, totalKg: 0, deposits: 0, history: [], supportedLocality: null };
+
+            window.focusAccountInput = openAccountInput;
+
+            window.closeAccountSession = function () {
+                forgetActiveAccount();
+                openAccountInput();
+            };
+
+            function formatNumber(value, digits) {
+                return Number(value).toLocaleString('es-CO', { maximumFractionDigits: digits || 0 });
+            }
+
+            function setButtonEnabled(button, enabled) {
+                button.disabled = !enabled;
+                button.classList.toggle('cursor-not-allowed', !enabled);
+                button.classList.toggle('opacity-50', !enabled);
+            }
+
+            function renderRewards() {
+                [
+                    ['rewardTransit', 1000],
+                    ['rewardMarket', 1500],
+                    ['rewardFuel', 800]
+                ].forEach(function (item) {
+                    const button = document.getElementById(item[0]);
+                    const enoughPoints = state.points >= item[1];
+                    button.disabled = !enoughPoints;
+                    button.textContent = enoughPoints ? 'Canjear' : 'Faltan ' + formatNumber(item[1] - state.points) + ' pts';
+                    button.title = enoughPoints ? '' : 'Te faltan ' + formatNumber(item[1] - state.points) + ' puntos.';
+                    button.classList.toggle('opacity-50', !enoughPoints);
+                    button.classList.toggle('cursor-not-allowed', !enoughPoints);
+                });
+            }
+
+            function renderHistory() {
+                const list = document.getElementById('historyList');
+                list.replaceChildren();
+                if (!state.history.length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-slate-500';
+                    empty.textContent = 'Aún no hay movimientos. Los depósitos y canjes de esta demo aparecerán aquí.';
+                    list.appendChild(empty);
+                    return;
+                }
+                state.history.slice(0, 5).forEach(function (entry) {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between gap-3 border-b border-slate-800/70 pb-2';
+                    const details = document.createElement('div');
+                    const name = document.createElement('p');
+                    name.className = 'font-medium text-slate-200';
+                    name.textContent = entry.label;
+                    const date = document.createElement('p');
+                    date.className = 'text-[10px] text-slate-500';
+                    date.textContent = new Date(entry.date).toLocaleString('es-CO');
+                    details.append(name, date);
+                    const amount = document.createElement('span');
+                    amount.className = entry.points >= 0 ? 'shrink-0 text-emerald-400 font-bold' : 'shrink-0 text-orange-300 font-bold';
+                    amount.textContent = (entry.points > 0 ? '+' : '') + formatNumber(entry.points) + ' pts';
+                    row.append(details, amount);
+                    list.appendChild(row);
+                });
+            }
+
+            function renderRanking() {
+                const entries = profiles[rankPeriod].map(function (profile) {
+                    return Object.assign({}, profile);
+                });
+                const now = new Date();
+                const periodStart = rankPeriod === 'semanal'
+                    ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+                    : new Date(now.getFullYear(), now.getMonth(), 1);
+                Object.keys(profilesByCode).forEach(function (code) {
+                    const account = code === currentCode && authenticated
+                        ? sanitizeState(state)
+                        : sanitizeState(profilesByCode[code]);
+                    const activity = account.history.filter(function (entry) {
+                        const date = new Date(entry.date);
+                        return entry.points > 0 && !Number.isNaN(date.getTime()) && date >= periodStart;
+                    });
+                    const displayName = account.displayName || code;
+                    entries.push({
+                        name: displayName,
+                        initials: displayName.split(/\s+/).slice(0, 2).map(function (part) {
+                            return part.charAt(0).toUpperCase();
+                        }).join(''),
+                        points: activity.reduce(function (sum, entry) { return sum + entry.points; }, 0),
+                        kg: activity.reduce(function (sum, entry) { return sum + entry.kg; }, 0),
+                        current: authenticated && code === currentCode,
+                        demoAccount: true
+                    });
+                });
+                entries.sort(function (a, b) { return b.points - a.points; });
+                const list = document.getElementById('rankingList');
+                list.replaceChildren();
+                entries.forEach(function (entry, index) {
+                    const row = document.createElement('div');
+                    row.className = 'px-4 py-3 flex items-center justify-between' + (entry.current ? ' bg-emerald-500/10 border-l-2 border-emerald-500' : '');
+                    const identity = document.createElement('div');
+                    identity.className = 'flex items-center space-x-3';
+                    const place = document.createElement('span');
+                    place.className = 'w-6 h-6 rounded-full bg-slate-800 text-slate-200 font-bold text-xs flex items-center justify-center';
+                    place.textContent = String(index + 1);
+                    const initials = document.createElement('span');
+                    initials.className = 'w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-emerald-400';
+                    initials.textContent = entry.initials;
+                    const labels = document.createElement('div');
+                    const name = document.createElement('h4');
+                    name.className = 'font-bold text-xs text-white';
+                    name.textContent = entry.name;
+                    const status = document.createElement('span');
+                    status.className = 'text-[10px] text-slate-400';
+                    status.textContent = entry.demoAccount
+                        ? (entry.current ? 'tu perfil · ' + currentCode : 'perfil de prueba')
+                        : 'perfil de ejemplo';
+                    labels.append(name, status);
+                    identity.append(place, initials, labels);
+                    const score = document.createElement('div');
+                    score.className = 'text-right';
+                    const points = document.createElement('div');
+                    points.className = 'text-xs font-bold ' + (entry.current ? 'text-emerald-400' : 'text-slate-200');
+                    points.textContent = formatNumber(entry.points) + ' pts';
+                    const weight = document.createElement('div');
+                    weight.className = 'text-[10px] text-slate-400';
+                    weight.textContent = formatNumber(entry.kg, 1) + ' kg';
+                    score.append(points, weight);
+                    row.append(identity, score);
+                    list.appendChild(row);
+                });
+            }
+
+            function updateVotes() {
+                const teusaquillo = state.supportedLocality === 'Teusaquillo'
+                    ? 49
+                    : state.supportedLocality === 'Chapinero' ? 47 : 48;
+                const chapinero = 100 - teusaquillo;
+                document.getElementById('barTeusaquillo').style.width = teusaquillo + '%';
+                document.getElementById('barChapinero').style.width = chapinero + '%';
+                document.getElementById('labelTeusaquillo').textContent = 'Teusaquillo (' + teusaquillo + '%)';
+                document.getElementById('labelChapinero').textContent = 'Chapinero (' + chapinero + '%)';
+                ['voteTeusaquillo', 'voteChapinero'].forEach(function (id) {
+                    const button = document.getElementById(id);
+                    button.disabled = !authenticated || Boolean(state.supportedLocality);
+                    button.classList.toggle('opacity-50', button.disabled);
+                });
+            }
+
+            function render() {
+                document.getElementById('accountLabel').textContent = authenticated
+                    ? (state.displayName || currentCode) + ' · ' + currentCode
+                    : 'Sin sesión';
+                document.getElementById('accountSwitchBtn').textContent = authenticated ? 'Cambiar' : 'Ingresar';
+                document.getElementById('userPoints').textContent = formatNumber(state.points);
+                document.getElementById('syncSaldo').textContent = formatNumber(state.points);
+                document.getElementById('authIdentity').textContent = currentCode || '';
+                document.getElementById('authDisplayName').textContent = state.displayName || currentCode || '';
+                document.getElementById('impactKg').textContent = formatNumber(state.totalKg, 1) + ' kg';
+                document.getElementById('impactDeposits').textContent = formatNumber(state.deposits);
+                renderRewards();
+                renderHistory();
+                renderRanking();
+                updateVotes();
+                updateEstimate();
+            }
+
+            window.switchTab = function (tabId, btnElement) {
+                ['caneca', 'hotspots', 'vs', 'ranking', 'recompensas'].forEach(function (id) {
+                    document.getElementById('section-' + id).classList.toggle('hidden', id !== tabId);
+                });
+                document.querySelectorAll('.nav-btn').forEach(function (button) {
+                    const active = button === btnElement;
+                    button.classList.toggle('text-emerald-400', active);
+                    button.classList.toggle('text-slate-400', !active);
+                    button.setAttribute('aria-current', active ? 'page' : 'false');
+                });
+                document.getElementById('mainContent').scrollTop = 0;
+            };
+
+            window.showModal = function (title, description, iconClass, iconContainerClass, action, actionLabel) {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalDesc').textContent = description;
+                const icon = document.getElementById('modalIcon');
+                icon.className = 'w-12 h-12 rounded-full flex items-center justify-center text-2xl mx-auto border ' + iconContainerClass;
+                icon.replaceChildren();
+                const iconElement = document.createElement('i');
+                iconElement.className = 'fa-solid ' + iconClass;
+                icon.appendChild(iconElement);
+                pendingAction = typeof action === 'function' ? action : null;
+                const cancel = document.getElementById('modalCancelButton');
+                const actionButton = document.getElementById('modalActionButton');
+                cancel.classList.toggle('hidden', !pendingAction);
+                actionButton.classList.toggle('w-full', !pendingAction);
+                actionButton.classList.toggle('flex-1', Boolean(pendingAction));
+                actionButton.textContent = actionLabel || 'Entendido';
+                lastFocusedElement = document.activeElement;
+                const modal = document.getElementById('customModal');
+                modal.classList.remove('hidden');
+                modal.setAttribute('aria-hidden', 'false');
+                actionButton.focus();
+            };
+
+            window.closeModal = function () {
+                pendingAction = null;
+                const modal = document.getElementById('customModal');
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+                if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
+            };
+
+            window.handleModalAction = function () {
+                const action = pendingAction;
+                window.closeModal();
+                if (action) action();
+            };
+
+            window.simularNFC = function () {
+                const input = document.getElementById('idInput');
+                const code = normalizeCode(input.value);
+                if (!/^[a-zA-Z0-9-]{4,20}$/.test(code)) {
+                    window.showModal('Código no válido', 'Escribe un código ficticio de 4 a 20 letras, números o guiones; no uses tu cédula.', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    input.focus();
+                    return;
+                }
+                const nameInput = document.getElementById('displayNameInput');
+                const existingProfile = profilesByCode[code];
+                const displayName = (existingProfile && existingProfile.displayName
+                    ? existingProfile.displayName
+                    : nameInput.value).trim().replace(/\s+/g, ' ');
+                if (!existingProfile || !existingProfile.displayName) {
+                    if (displayName.length < 2 || displayName.length > 24) {
+                        window.showModal('Nombre no válido', 'Escribe un nombre visible de 2 a 24 caracteres para el ranking.', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                        nameInput.focus();
+                        return;
+                    }
+                }
+                if (authenticated && currentCode === code) {
+                    if (!existingProfile.displayName && displayName !== state.displayName) {
+                        state.displayName = displayName;
+                        saveState();
+                        render();
+                        nameInput.value = displayName;
+                        nameInput.readOnly = true;
+                        document.getElementById('displayNameHelp').textContent = 'Este nombre está asociado al perfil.';
+                        window.showModal('Nombre guardado', 'Tu perfil aparecerá en el ranking como ' + displayName + '.', 'fa-user-check', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+                        return;
+                    }
+                    window.showModal('Perfil ya activo', 'Ya estás usando el perfil ' + code + '.', 'fa-user-check', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+                    return;
+                }
+                const result = activateAccount(code, displayName);
+                const message = result.importedLegacy
+                    ? 'Se importaron los datos de la demo anterior a este primer perfil.'
+                    : result.isNewAccount
+                        ? 'Este es un perfil nuevo con saldo inicial de 1.250 puntos de demostración.'
+                        : 'Se cargaron el saldo, historial y voto guardados para este código.';
+                window.showModal('Perfil activo: ' + code, message + ' Los perfiles solo viven en este navegador; no son cuentas seguras ni se conectan con TuLlave.', 'fa-user-check', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+            };
+
+            window.selectResiduo = function (type, name, basePoints) {
+                selectedResiduo = { type: type, name: name, basePoints: basePoints };
+                document.querySelectorAll('.residuo-card').forEach(function (card) {
+                    const selected = card.getAttribute('onclick').includes("'" + type + "'");
+                    card.setAttribute('aria-checked', String(selected));
+                    card.classList.toggle('ring-2', selected);
+                    card.classList.toggle('ring-emerald-400', selected);
+                    card.classList.toggle('border-emerald-400', selected);
+                });
+                document.getElementById('selectedResiduoText').textContent = name + ' (' + basePoints + ' pts/kg)';
+                updateEstimate();
+            };
+
+            window.updateEstimate = function () {
+                const weightInput = document.getElementById('weightInput');
+                const weight = Number(weightInput.value);
+                const validWeight = Number.isFinite(weight) && weight >= 0.1 && weight <= 20;
+                const multiplier = Number(document.getElementById('locationSelect').value);
+                const points = selectedResiduo && validWeight ? Math.round(selectedResiduo.basePoints * weight * multiplier) : 0;
+                document.getElementById('pointsEstimate').textContent = selectedResiduo
+                    ? (validWeight ? formatNumber(points) + ' pts (x' + formatNumber(multiplier, 1) + ')' : 'Ingresa un peso entre 0,1 y 20 kg')
+                    : 'Selecciona un residuo';
+                const enabled = authenticated && Boolean(selectedResiduo) && validWeight;
+                const button = document.getElementById('btnDepositar');
+                setButtonEnabled(button, enabled);
+                document.getElementById('depositHelp').textContent = !authenticated
+                    ? 'Valida el código de prueba para poder depositar.'
+                    : !selectedResiduo
+                        ? 'Selecciona un residuo para continuar.'
+                        : !validWeight
+                            ? 'El peso debe estar entre 0,1 y 20 kg.'
+                            : 'Revisa los puntos estimados y confirma el depósito.';
+            };
+
+            window.depositarResiduo = function () {
+                if (!authenticated || !selectedResiduo) {
+                    window.showModal('Completa los pasos', 'Valida un código ficticio y selecciona el tipo de residuo antes de depositar.', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    return;
+                }
+                const weight = Number(document.getElementById('weightInput').value);
+                if (!Number.isFinite(weight) || weight < 0.1 || weight > 20) {
+                    updateEstimate();
+                    return;
+                }
+                const multiplier = Number(document.getElementById('locationSelect').value);
+                const points = Math.round(selectedResiduo.basePoints * weight * multiplier);
+                const material = selectedResiduo.name;
+                window.showModal(
+                    'Confirmar depósito',
+                    material + ' · ' + formatNumber(weight, 1) + ' kg · x' + formatNumber(multiplier, 1) + ' = ' + formatNumber(points) + ' puntos. ¿Confirmas esta simulación?',
+                    'fa-box-archive',
+                    'text-emerald-400 bg-emerald-500/20 border-emerald-500/40',
+                    function () {
+                        state.points += points;
+                        state.totalKg += weight;
+                        state.deposits += 1;
+                        state.history.unshift({
+                            label: 'Depósito · ' + material,
+                            points: points,
+                            date: new Date().toISOString(),
+                            kg: weight
+                        });
+                        selectedResiduo = null;
+                        document.getElementById('selectedResiduoText').textContent = 'Ninguno (Selecciona arriba)';
+                        document.querySelectorAll('.residuo-card').forEach(function (card) {
+                            card.setAttribute('aria-checked', 'false');
+                            card.classList.remove('ring-2', 'ring-emerald-400', 'border-emerald-400');
+                        });
+                        saveState();
+                        render();
+                        window.showModal('Depósito registrado en la demo', 'Sumaste ' + formatNumber(points) + ' puntos. No se comunicó con una caneca o sensor real.', 'fa-recycle', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+                    },
+                    'Confirmar depósito'
+                );
+            };
+
+            window.apoyarLocalidad = function (name) {
+                if (!authenticated) {
+                    window.showModal('Inicia un perfil de prueba', 'Ingresa un código ficticio en la pestaña Caneca antes de apoyar una localidad.', 'fa-user-check', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    return;
+                }
+                if (state.supportedLocality) {
+                    window.showModal('Voto ya registrado', 'En esta demo solo puedes apoyar una localidad por navegador. Ya elegiste ' + state.supportedLocality + '.', 'fa-circle-info', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    return;
+                }
+                state.supportedLocality = name;
+                saveState();
+                render();
+                window.showModal('Apoyo registrado', 'Tu voto de demostración quedó a favor de ' + name + '. No suma puntos ni modifica datos reales.', 'fa-hand-holding-heart', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+            };
+
+            window.canjearRecompensa = function (prize, cost) {
+                if (!authenticated) {
+                    window.showModal('Valida el usuario de prueba', 'Usa un código ficticio en la pestaña Caneca antes de simular un canje.', 'fa-user-check', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    return;
+                }
+                if (state.points < cost) {
+                    window.showModal('Puntos insuficientes', 'Te faltan ' + formatNumber(cost - state.points) + ' puntos para ' + prize + '.', 'fa-triangle-exclamation', 'text-orange-400 bg-orange-500/20 border-orange-500/40');
+                    return;
+                }
+                window.showModal(
+                    'Confirmar canje',
+                    prize + ' cuesta ' + formatNumber(cost) + ' puntos. El canje es solo demostrativo; no se emitirá un bono real.',
+                    'fa-ticket',
+                    'text-orange-400 bg-orange-500/20 border-orange-500/40',
+                    function () {
+                        state.points -= cost;
+                        state.history.unshift({
+                            label: 'Canje · ' + prize,
+                            points: -cost,
+                            date: new Date().toISOString()
+                        });
+                        saveState();
+                        render();
+                        window.showModal('Canje simulado', 'Se descontaron ' + formatNumber(cost) + ' puntos de prueba. No se generó un bono ni se notificó a un aliado.', 'fa-ticket', 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40');
+                    },
+                    'Confirmar canje'
+                );
+            };
+
+            window.toggleRankingTab = function (period) {
+                rankPeriod = period === 'mensual' ? 'mensual' : 'semanal';
+                const weekly = rankPeriod === 'semanal';
+                document.getElementById('tabSemanalBtn').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg ' + (weekly ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white') + ' transition';
+                document.getElementById('tabMensualBtn').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg ' + (!weekly ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white') + ' transition';
+                renderRanking();
+            };
+
+            window.verHotspotEnMapa = function (locationId) {
+                const location = hotspotLocations[locationId];
+                if (!location) {
+                    console.error('No existe una ubicación configurada para el mapa:', locationId);
+                    return;
+                }
+                const latitude = location.latitude;
+                const longitude = location.longitude;
+                const offset = 0.006;
+                const bounds = [
+                    (longitude - offset).toFixed(5),
+                    (latitude - offset).toFixed(5),
+                    (longitude + offset).toFixed(5),
+                    (latitude + offset).toFixed(5)
+                ].join(',');
+                const frame = document.getElementById('hotspotMapFrame');
+                const mapPanel = document.getElementById('hotspotMapPanel');
+                const embedUrl = new URL('https://www.openstreetmap.org/export/embed.html');
+                embedUrl.searchParams.set('bbox', bounds);
+                embedUrl.searchParams.set('layer', 'mapnik');
+                embedUrl.searchParams.set('marker', latitude + ',' + longitude);
+                frame.src = embedUrl.toString();
+                frame.title = 'Mapa de referencia: ' + location.name;
+                document.getElementById('hotspotMapTitle').textContent = location.name;
+                document.getElementById('hotspotMapAddress').textContent = location.address;
+                document.getElementById('hotspotMapLink').href =
+                    'https://www.openstreetmap.org/#map=17/' + latitude + '/' + longitude;
+                hotspotMapOpener = document.activeElement;
+                mapPanel.classList.remove('hidden');
+                mapPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                document.getElementById('hotspotMapTitle').focus({ preventScroll: true });
+            };
+
+            window.cerrarMapaHotspot = function () {
+                document.getElementById('hotspotMapFrame').removeAttribute('src');
+                document.getElementById('hotspotMapPanel').classList.add('hidden');
+                if (hotspotMapOpener && typeof hotspotMapOpener.focus === 'function') {
+                    hotspotMapOpener.focus();
+                }
+            };
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !document.getElementById('customModal').classList.contains('hidden')) {
+                    window.closeModal();
+                }
+            });
+            restoreActiveAccount();
+            render();
+        })();
+    </script>
+</body>
+</html>
